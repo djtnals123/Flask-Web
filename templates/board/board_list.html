@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/logo.png')}}">
+<title>Sumin</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/normalize.css')}}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/layout.css')}}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font.css')}}">
+<script src="{{ url_for('static', filename='js/jquery.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/jquery-ui-1.10.3.custom.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/submenu.js')}}"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+		$("#writeBtn").on('click', function() {
+			location.href='{{ url_for('board.write')}}';
+		});
+	});
+</script>
+</head>
+
+<body>
+<!-- wrap :s -->
+	<div id="wrapper">
+
+		<!-- header :s -->
+        {% include "include/header/header.html" %}
+		<!-- header :e -->
+
+
+		<!-- contentsWrap :s -->
+		<div id="contentsWrap">
+
+			<!-- lnbWrap :s -->
+            {% include "include/navigation_bar/lnb_board.html" %}
+			<!-- lnbWrap :e -->
+
+			<!-- container :s -->
+			<div id="container">
+
+				<div class="location">
+					<span class="home"><a href="#"><img src="{{ url_for('static', filename='img/layout/ico_home.png')}}"
+                                                        alt="홈"></a></span>
+					<span class="arrow">&gt;</span>
+					<a href="#"> <span class="first">게시판</span></a>
+					<span class="arrow">&gt;</span>
+					<a href="#"> <span>공지사항</span></a>
+				</div>
+
+				<h3 id="contTi">공지 사항</h3>
+
+				<!-- 컨텐츠영역 txt :s -->
+				<div id="txt">
+					
+					<h4>공지사항</h4>
+					<!-- table :s -->
+					<table class="tbl_basic" style="table-layout:fixed;">
+			            <caption>
+			                <strong>공지사항</strong>
+			                <details>
+			                    <summary>공지사항</summary>
+			                </details>
+			            </caption>
+		                <thead>
+		                    <tr>
+		                        <th class="trw" width=30>No</th>
+		                        <th class="trw">제목</th>
+		                        <th class="trw" width=100>작성자</th>
+		                        <th class="trw" width=120>작성일</th>
+		                    </tr>
+		                </thead>
+		                <tbody>
+                        {% for board in board_list.items %}
+							<tr>
+								<td>{{ board.board_id }}</td>
+								<td><a href="{{ url_for('board.read', bid=board.board_id) }}">{{ board.title }}</a></td>
+								<td>{{ board.writer }}</td>
+								<td>{{ board.created_date|datetime }}</td>
+							</tr>
+                        {% endfor %}
+		                </tbody>
+		            </table>
+		            <!-- table :e -->
+					
+		            <!-- paging & search :s -->
+		            <ul class="paginate">
+                        {% if board_list.has_prev %}
+                        <li class="dir prev">
+                            <a href="{{ url_for('board._list', page=board_list.prev_num, per_page=criteria.per_page,
+                                option=criteria.option, keyword=criteria.keyword)}}" title="이전페이지로 이동">«</a></li>
+                        {% endif %}
+                        {% for page_num in board_list.iter_pages() %}
+                            {% if page_num %}
+                                {% if page_num == board_list.page %}
+                                <li class="active">
+                                    <a href="{{ url_for('board._list', page=page_num, per_page=criteria.per_page,
+                                            option=criteria.option, keyword=criteria.keyword)}}"
+                                            title="{{ page_num }}페이지">{{ page_num }}</a>
+                                </li>
+                                {% else %}
+                                <li>
+                                    <a href="{{ url_for('board._list', page=page_num, per_page=criteria.per_page,
+                                            option=criteria.option, keyword=criteria.keyword)}}"
+                                            title="{{ page_num }}페이지">{{ page_num }}</a>
+                                </li>
+                                {% endif %}
+                           {% else %}
+                            <li>
+                               <span>...</span>
+                            </li>
+                           {% endif %}
+                        {% endfor %}
+                        {% if board_list.has_next %}
+                        <li class="dir next"><a href="{{ url_for('board._list', page=board_list.next_num,
+                                                per_page=criteria.per_page, option=criteria.option,
+                                                keyword=criteria.keyword)}}" title="다음페이지로 이동">»</a></li>
+                        {% endif %}
+
+					</ul>
+					<div id="searchtab">
+					<form class="search_info" style="background: #ffffff">
+                        <li>
+                            <select name="option" class="searchOption">
+                                <option value="title" {% if criteria.option=='title' %}selected{% endif %}>제목</option>
+                                <option value="content" {% if criteria.option=='content' %}selected{% endif %}>내용</option>
+                                <option value="title+content" {% if criteria.option=='title+content' %}selected{% endif %}>제목+내용</option>
+                                <option value="writer" {% if criteria.option=='writer' %}selected{% endif %}>작성자</option>
+                            </select>
+                            <input type="text" name="keyword" class="inputText" value="{{ criteria.keyword or '' }}"
+                                   class="inputText" placeholder="조건 입력"/>
+						    <input type="hidden" name="per_page" value="{{ criteria.per_page }}"/>
+                            <input type="submit" id="searchButton" class="submitbtn" value="검색" class="searchBtn"/>
+                        </li>
+					</form>
+					</div>
+		            <!-- paging & search :e -->
+					<span class="rightButton" >
+						<button type="button" class="mainbtn" id="writeBtn">게시판 작성</button>
+					</span>
+				</div>
+				<!-- 컨텐츠영역 txt :e -->
+
+			</div>
+			<!-- container :e -->
+
+		</div>
+		<!-- contentsWrap :e -->
+
+		
+		<!-- footerWrap :s -->
+        {% include "include/footer/footer.html" %}
+		<!-- footerWrap :e -->
+	</div>
+</body>
+</html>

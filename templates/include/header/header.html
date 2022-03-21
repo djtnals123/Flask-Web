@@ -1,0 +1,17 @@
+		<div id="headerWrap">
+			<div id="header">
+				<h1 id="logo"><a href="#"><img src="{{ url_for('static', filename='img/layout/logo.png')}}"
+                                               alt="서울대학교 병원" /></a></h1>
+				<!-- gnbWrap :s -->
+                {% include "include/navigation_bar/gnb.html" %}
+				<!-- gnbWrap :e -->
+
+				<div id="globalWrap">
+					<ul class="global">
+						<li>안녕하세요. {{ g.user.id }}님</li>
+						<li><a href="{{ url_for('account.modify') }}"> 회원정보수정</a></li>
+						<li><a href="{{ url_for('index.logout') }}"> 로그아웃</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/logo.png')}}">
+<title>Sumin</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/normalize.css')}}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/layout.css')}}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font.css')}}">
+<script src="{{ url_for('static', filename='js/jquery.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/jquery-ui-1.10.3.custom.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/submenu.js')}}"></script>
+<script type="text/javascript">
+</script>
+</head>
+
+<body>
+<!-- wrap :s -->
+	<div id="wrapper">
+
+		<!-- header :s -->
+        {% include "include/header/header.html" %}
+		<!-- header :e -->
+
+
+		<!-- contentsWrap :s -->
+		<div id="contentsWrap">
+
+			<!-- lnbWrap :s -->
+            {% include "include/navigation_bar/lnb_admin.html" %}
+			<!-- lnbWrap :e -->
+
+			<!-- container :s -->
+			<div id="container">
+
+				<div class="location">
+					<span class="home"><a href="#"><img src="{{ url_for('static', filename='img/layout/ico_home.png')}}"
+                                                        alt="홈"></a></span>
+					<span class="arrow">&gt;</span>
+					<a href="#"> <span class="first">사용자 관리</span></a>
+					<span class="arrow">&gt;</span>
+					<a href="#"> <span>계정 관리</span></a>
+				</div>
+
+				<h3 id="contTi">계정 관리</h3>
+
+				<!-- 컨텐츠영역 txt :s -->
+				<div id="txt">
+					
+					<h4>계정 목록</h4>
+					<!-- table :s -->
+					<table class="tbl_basic" style="table-layout:fixed;">
+			            <caption>
+			                <strong>계정목록</strong>
+			                <details>
+			                    <summary>계정 목록</summary>
+			                </details>
+			            </caption>
+		                <thead>
+		                    <tr>
+		                        <th class="trw" width=30>No</th>
+		                        <th class="trw" width=120>아이디</th>
+		                        <th class="trw" width=100>이름</th>
+		                        <th class="trw" width=100>계정<br>유형</th>
+		                        <th class="trw" width=120>병원</th>
+		                        <th class="trw" width="120">E-Mail</th>
+		                        <th class="trw" >가입 날짜</th>
+		                    </tr>
+		                </thead>
+		                <tbody>
+                        {% for account in account_list.items %}
+							<tr>
+								<td>{{ account_list.total - ((account_list.page - 1) * account_list.per_page)
+								 - loop.index0 }}</td>
+								<td>{{ account.id }}</td>
+								<td>{{ account.name }}</td>
+								<td>
+                                    {% for role in account.auth_set %}
+                                        {{ role.role }}{% if not loop.last %}<br>{% endif %}
+                                    {% endfor %}
+                                </td>
+								<td>{{ account.hospital.replace('S', '서울대병원').replace('K', '고려대병원') }}</td>
+								<td>{{ account.email }}</td>
+								<td>{{ account.created_date|datetime }}</td>
+							</tr>
+                        {% endfor %}
+		                </tbody>
+		            </table>
+		            <!-- table :e -->
+					
+		            <!-- paging & search :s -->
+		            <ul class="paginate">
+                        {% if account_list.has_prev %}
+                        <li class="dir prev"><a href="{{ url_for('admin.user_list', page=account_list.prev_num,
+                                per_page=criteria.per_page )}}" title="이전페이지로 이동">«</a></li>
+                        {% endif %}
+                        {% for page_num in account_list.iter_pages() %}
+                            {% if page_num %}
+                                {% if page_num == account_list.page %}
+                                <li class="active">
+                                    <a href="{{ url_for('admin.user_list', page=page_num, per_page=criteria.per_page)}}"
+                                       title="{{ page_num }}페이지">{{ page_num }}</a>
+                                </li>
+                                {% else %}
+                                <li>
+                                    <a href="{{ url_for('admin.user_list', page=page_num, per_page=criteria.per_page)}}"
+                                       title="{{ page_num }}페이지">{{ page_num }}</a>
+                                </li>
+                                {% endif %}
+                            {% else %}
+                            <li>
+                               <span>...</span>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        <li class="dir next"><a href="{{ url_for('admin.user_list', page=account_list.next_num,
+                                per_page=criteria.per_page )}}"title="다음페이지로 이동">»</a></li>
+
+					</ul>
+		            <!-- paging & search :e -->
+				</div>
+				<!-- 컨텐츠영역 txt :e -->
+
+			</div>
+			<!-- container :e -->
+
+		</div>
+		<!-- contentsWrap :e -->
+
+		
+		<!-- footerWrap :s -->
+        {% include "include/footer/footer.html" %}
+		<!-- footerWrap :e -->
+	</div>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/logo.png')}}">
+<title>ADRM</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/normalize.css')}}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/join.css')}}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font.css')}}">
+<script src="{{ url_for('static', filename='js/jquery.min.js')}}"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        history.replaceState({}, null, location.pathname);
+        let url;
+        if(location.pathname.indexOf('modify') == -1)
+        	url = "{{url_for('account.register')}}";
+        else {
+        	url = "{{url_for('account.modify')}}";
+        	$("#id").attr("disabled",true);
+        }
+        $("#submit").on('click', function() {
+        	submit(url);
+        });
+        $("#cancelBtn").on('click', function() {
+        	location.href='/account/agree';
+        });
+    });
+
+    function submit(url) {
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: $('#joinFrm').serialize(),
+            success: function(redirect){
+                location.href=redirect;
+            },
+            error: function(err){
+                alert(12);
+                if(err.status == 500)
+                    alert('Error');
+                else if(err.status == 401) {
+                    alert(err.responseJSON.msg);
+                    console.log(err);
+                }
+            }
+        });
+    }
+</script>
+<style type="text/css">
+	#joinFrm label.error {
+		color: #ff0000;
+		display: none;
+	}
+</style>
+<title>Sumin Lecture</title>
+</head>
+<body>
+	<!-- wrap :s -->
+	<div id="wrap">
+		<!-- header :s -->
+        {% include "include/header/header_main.html" %}
+		<!-- header :e -->
+
+		<!-- container :s -->
+		<div id="container">
+			<div id="content">
+				<h4>{% if g.user %}회원정보수정
+                    {% else %}회원가입
+                    {% endif %}
+                </h4>
+				<form id="joinFrm" name="joinFrm" target="_top">
+					<table class="tbl_basic center">
+						<tbody>
+							<tr>
+								<td class="trw1" >ID</td>
+								<td class="trw" >
+									<div class="join_input_row">
+										<span class="input_box">
+											<label for="id" id="label_id_area" class="lbl">ID</label>
+											<input type="text" id="id" name="id" class="int" maxlength="30"
+                                                   value="{{ g.user.id or '' }}">
+										</span>
+									</div>
+									<label for="id" class="error"></label>
+								</td>
+							</tr>
+							<tr>
+								<td class="trw1" >비밀번호</td>
+								<td class="trw" >
+									<div class="join_input_row">
+										<span class="input_box">
+											<label for="pw" id="label_pw_area" class="lbl">Password</label>
+											<input type="password" id="pw" name="pw" class="int" maxlength="30" >
+										</span>
+									</div>
+									<label for="pw" class="error"></label>
+								</td>
+							</tr>
+							<tr>
+								<td class="trw1" >비밀번호 확인</td>
+								<td class="trw" >
+									<div class="join_input_row">
+										<span class="input_box">
+											<label for="pw" id="label_pw_area" class="lbl">Password</label>
+											<input type="password" id="confirm_pw" name="confirm_pw" class="int" maxlength="30" >
+										</span>
+									</div>
+									<label for="confirm_pw" class="error"></label>
+								</td>
+							</tr>
+							<tr>
+								<td class="trw1" >E-MAIL</td>
+								<td class="trw" >
+									<div class="join_input_row">
+										<span class="input_box">
+											<label for="id" id="label_id_area" class="lbl">ID</label>
+											<input type="text" id="email" name="email" class="int" maxlength="30"
+                                                   value="{{ g.user.email or '' }}" >
+										</span>
+									</div>
+									<label for="email" class="error"></label>
+								</td>
+							</tr>
+							<tr>
+								<td class="trw1" >이름</td>
+								<td class="trw" >
+									<div class="join_input_row">
+										<span class="input_box">
+											<label for="id" id="label_id_area" class="lbl">ID</label>
+											<input type="text" id="name" name="name" class="int" maxlength="30"
+                                                   value="{{ g.user.name or '' }}">
+										</span>
+									</div>
+									<label for="name" class="error"></label>
+								</td>
+							</tr>
+							<tr>
+								<td class="trw1" >병원선택</td>
+								<td class="trw" >
+									<select id="hospital" name="hospital" class="select_box">
+										<option value="S" {% if g.user.hospital == 'S' %}selected{% endif %}>서울대학교 병원</option>
+										<option value="K" {% if g.user.hospital == 'K' %}selected{% endif %}>고려대학교 병원</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="trw1" >회원형태</td>
+								<td class="trw" >
+									<div class="none_input_row" id="select_roll">
+										<span class="chkbox_area">
+                                            <input id="role1" type="checkbox" name="roles" value="1" tabindex="9" class="chkbox"
+                                                   {% for role in g.user.auth_set %}
+                                                        {% if role.role == 'ROLE_PATIENT' %}checked{% endif %}
+                                                   {% endfor %}
+                                            >환자
+                                        </span>
+										<span class="chkbox_area">
+                                            <input id="role2" type="checkbox" name="roles" value="2" tabindex="9" class="chkbox"
+                                                   {% for role in g.user.auth_set %}
+                                                        {% if role.role == 'ROLE_DOCTOR' %}checked{% endif %}
+                                                    {% endfor %}
+                                            >의사
+                                        </span>
+									</div>
+									<label for="roles" class="error"></label>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<fieldset class="login_form">
+                        {% if g.user %}회원정보수정
+						<input type="button" title="회원정보수정" alt="회원정보수정" value="회원정보수정" class="btn_login" id="submit">
+                        {% else %}회원가입
+						<input type="button" title="회원가입" alt="회원가입" value="회원가입" class="btn_login" id="submit">
+                        {% endif %}
+						<input id="cancelBtn" type="button" title="취소" alt="취소" value="취소" class="btn_cancel">
+					</fieldset>
+                    {{ form.csrf_token }}
+				</form>
+			</div>
+			
+		</div>
+		<!-- container :e -->
+
+		<!-- footer :s -->
+        {% include "include/footer/footer_main.html" %}
+		<!-- footer :e	 -->
+
+	
+
+	</div>
+<!-- wrap :e -->
+</body>
+</html>

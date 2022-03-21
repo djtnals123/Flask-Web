@@ -1,0 +1,8 @@
+<!-- 필드오류 -->
+<script type="text/javascript">
+    {% if form.errors.items() %}
+        alert('{{form.errors.items()|first_error}}')
+    {% elif error %}
+        alert('{{ error }}');
+    {% endif %}
+</script>

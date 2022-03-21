@@ -1,0 +1,23 @@
+				<div id="gnbWrap">
+					<div id="gnb">
+						<ul class="menu">
+                        {% for role in g.user.auth_set %}
+                            {% if role.role == 'ROLE_ADMIN' %}
+							<li><a href="#">사용자 관리</a>
+								<ul class="sub">
+									<li><a href="{{ url_for('admin.user_list') }}">계정 관리</a></li>
+								</ul>
+							</li>
+                                {% break %}
+                            {% endif %}
+                        {% endfor %}
+
+							<li><a href="#">게시판 관리</a>
+								<ul class="sub">
+									<li><a href="{{ url_for('board._list') }}">공지사항</a></li>
+									<li><a href="{{ url_for('board._list') }}">자유게시판</a></li>
+								</ul>
+							</li>
+						</ul>
+					 </div>
+			 	</div>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/logo.png')}}">
+<title>Sumin Lecture</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/normalize.css')}}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/choose_func.css')}}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font.css')}}">
+<script src="{{ url_for('static', filename='js/jquery.min.js')}}"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#patient").on('click', function() {
+            alert('준비중입니다.');
+        });
+    });
+</script>
+</head>
+<body>
+<!-- wrap :s -->
+	<div id="wrap">
+		<!-- header :s -->
+        {% include "include/header/header_main.html" %}
+		<!-- header :e -->
+
+		<!-- container :s -->
+		<div id="container">
+			<div id="content">
+				<h4 class="hide">기능 선택</h4>
+                    {% for role in g.user.auth_set %}
+                        {% if role.role == 'ROLE_DOCTOR' or role.role == 'ROLE_ADMIN' %}
+                        <a class="btn_wrap2" href="{{ url_for('board._list') }}">
+                            <span class="horizontal_align">
+                                <p><img src="{{ url_for('static', filename='img/doctor.png')}}"></p>의사<b>Doctor</b>
+                            </span>
+                        </a>
+                            {% break %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for role in g.user.auth_set %}
+                        {% if role.role == 'ROLE_PATIENT' or role.role == 'ROLE_ADMIN' %}
+                        <a class="btn_wrap" id="patient">
+                            <span class="horizontal_align">
+                                <p><img src="{{ url_for('static', filename='img/medicine.png')}}"></p>환자<b>Patient</b>
+                            </span>
+                        </a>
+                            {% break %}
+                        {% endif %}
+                    {% endfor %}
+			</div>
+			
+		</div>
+		<!-- container :e -->
+
+		<!-- footer :s -->
+        {% include "include/footer/footer_main.html" %}
+		<!-- footer :e	 -->
+
+	
+
+	</div>
+<!-- wrap :e -->
+
+</body>
+</html>
